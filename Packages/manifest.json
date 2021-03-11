@@ -9,7 +9,9 @@
     }
   ],
   "dependencies": {
+    "com.unity.ide.rider": "2.0.7",
     "com.unity.timeline": "1.4.5",
+    "jp.keijiro.minis": "1.0.9",
     "com.unity.modules.uielements": "1.0.0"
   }
 }

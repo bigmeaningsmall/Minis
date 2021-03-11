@@ -5,8 +5,16 @@ using UnityEngine.InputSystem.Layouts;
 // NoteCallback.cs - This script shows how to define a callback to get notified
 // on MIDI note-on/off events.
 
-sealed class NoteCallback : MonoBehaviour
-{
+sealed class NoteCallback : MonoBehaviour{
+
+    public bool noteOn;
+    public int noteNumber;
+    public string noteName;
+    public float velocity;
+    
+    public delegate void NoteAction(bool on, int number, string name, float velocity);
+    public static event NoteAction OnNoteAction;
+    
     void Start()
     {
         InputSystem.onDeviceChange += (device, change) =>
@@ -30,6 +38,12 @@ sealed class NoteCallback : MonoBehaviour
                     (note.device as Minis.MidiDevice)?.channel,
                     note.device.description.product
                 ));
+
+                noteOn = true;
+                noteNumber = note.noteNumber;
+                noteName = note.shortDisplayName;
+                this.velocity = velocity;
+                BroadcastNote(noteOn,noteNumber,noteName,velocity);
             };
 
             midiDevice.onWillNoteOff += (note) => {
@@ -40,7 +54,21 @@ sealed class NoteCallback : MonoBehaviour
                     (note.device as Minis.MidiDevice)?.channel,
                     note.device.description.product
                 ));
+                
+                noteOn = false;
+                noteNumber = note.noteNumber;
+                noteName = note.shortDisplayName;
+                this.velocity = 0;
+                BroadcastNote(noteOn,noteNumber,noteName,velocity);
             };
+            
+            
         };
+    }
+
+    private void BroadcastNote(bool t, int num, string name, float vel){
+        if (OnNoteAction != null){
+            OnNoteAction(t,num,name,vel);
+        }
     }
 }
